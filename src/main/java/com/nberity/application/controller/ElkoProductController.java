@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.nio.charset.StandardCharsets;
+
 @RestController
 public class ElkoProductController {
 
@@ -20,7 +22,8 @@ public class ElkoProductController {
     @RequestMapping(value = "/rest/elko-products", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public String getAvailableElkoProductsInJson() {
-        return elkoProductsJobService.getAvailableElkoProductsInJson().getElkoProductJson();
+        byte[] bytes = elkoProductsJobService.getAvailableElkoProductsInJson().getElkoProductJson().getBytes(StandardCharsets.UTF_8);
+        return new String(bytes, StandardCharsets.UTF_8);
     }
 
 }
