@@ -20,10 +20,9 @@ public class ElkoProductController {
     }
 
     @RequestMapping(value = "/rest/elko-products", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+            produces = "application/json;charset=UTF-8")
     public String getAvailableElkoProductsInJson() {
-        byte[] bytes = elkoProductsJobService.getAvailableElkoProductsInJson().getElkoProductJson().getBytes(StandardCharsets.UTF_8);
-        return new String(bytes, StandardCharsets.UTF_8);
+        return elkoProductsJobService.getAvailableElkoProductsInJson().getElkoProductJson();
     }
 
 }
