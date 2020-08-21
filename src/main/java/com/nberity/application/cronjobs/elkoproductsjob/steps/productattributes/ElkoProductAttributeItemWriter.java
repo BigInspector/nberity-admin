@@ -35,5 +35,6 @@ public class ElkoProductAttributeItemWriter implements ItemWriter<ElkoProduct> {
 
         long end = System.currentTimeMillis();
         System.out.println("Time elapsed for 1000 batch: " + ((end - start) / 1000));
+        index++;
     }
 }

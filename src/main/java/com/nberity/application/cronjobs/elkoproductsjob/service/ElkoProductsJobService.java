@@ -3,6 +3,8 @@ package com.nberity.application.cronjobs.elkoproductsjob.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nberity.application.cronjobs.elkoproductsjob.model.ElkoProduct;
+import com.nberity.application.cronjobs.elkoproductsjob.model.ElkoProductInfoJson;
+import com.nberity.application.cronjobs.elkoproductsjob.repository.ElkoProductInfoJsonRepository;
 import com.nberity.application.cronjobs.elkoproductsjob.repository.ElkoProductsJobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,13 +19,17 @@ public class ElkoProductsJobService {
 
     private ElkoProductsJobRepository elkoProductsJobRepository;
 
+    private ElkoProductInfoJsonRepository elkoProductInfoJsonRepository;
+
     @Autowired
-    private ElkoProductsJobService(ElkoProductJobWsClient elkoProductJobWsClient, ElkoProductsJobRepository elkoProductsJobRepository) {
+    private ElkoProductsJobService(ElkoProductJobWsClient elkoProductJobWsClient, ElkoProductsJobRepository elkoProductsJobRepository,
+                                   ElkoProductInfoJsonRepository elkoProductInfoJsonRepository) {
         this.elkoProductJobWsClient = elkoProductJobWsClient;
         this.elkoProductsJobRepository = elkoProductsJobRepository;
+        this.elkoProductInfoJsonRepository = elkoProductInfoJsonRepository;
     }
 
-    public List<ElkoProduct> getAllElkoProducts() {
+    public List<ElkoProduct> getAllElkoProductsFromWebService() {
         long start = System.currentTimeMillis();
         String allElkoProductsJsonArrayString =  elkoProductJobWsClient.getAllElkoProductsJsonArrayString();
         long end = System.currentTimeMillis();
@@ -55,5 +61,17 @@ public class ElkoProductsJobService {
 
     public void saveAllElkoProducts(List<ElkoProduct> items) {
         elkoProductsJobRepository.saveAll(items);
+    }
+
+    public List<ElkoProduct> getAllLatestElkoProductsWithAvailableStock() {
+        return elkoProductsJobRepository.getAllLatestElkoProductsWithAvailableStock();
+    }
+
+    public void saveElkoProductsJson(ElkoProductInfoJson elkoProductInfoJson) {
+        elkoProductInfoJsonRepository.save(elkoProductInfoJson);
+    }
+
+    public ElkoProductInfoJson getAvailableElkoProductsInJson() {
+        return elkoProductInfoJsonRepository.getAvailableElkoProductsInJson();
     }
 }

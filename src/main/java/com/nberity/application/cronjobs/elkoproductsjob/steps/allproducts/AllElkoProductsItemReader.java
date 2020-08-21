@@ -29,7 +29,7 @@ public class AllElkoProductsItemReader implements ItemReader<ElkoProduct> {
         index = 0;
         System.out.println("INDEX: " + index);
         System.out.println("Starting to gather all ELKO products from WS...");
-        elkoProducts = elkoProductsJobService.getAllElkoProducts();
+        elkoProducts = elkoProductsJobService.getAllElkoProductsFromWebService();
         System.out.println("Figuring out the latest product version nr...");
         latestElkoProductsVersionNr = elkoProductsJobService.getMostRecentProductsVersionNr() + 1;
         stepExecution.getJobExecution().getExecutionContext().putInt("latestVersionNr", latestElkoProductsVersionNr);

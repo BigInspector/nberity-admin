@@ -17,7 +17,8 @@ public class ElkoProductsJobConfig {
     @Bean
     public Job elkoProductsJob(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory,
                                ItemReader<ElkoProduct> allElkoProductsItemReader, ItemWriter<ElkoProduct> allElkoProductsItemWriter,
-                               ItemReader<ElkoProduct> elkoProductAttributeItemReader, ItemWriter<ElkoProduct> elkoProductAttributeItemWriter) {
+                               ItemReader<ElkoProduct> elkoProductAttributeItemReader, ItemWriter<ElkoProduct> elkoProductAttributeItemWriter,
+                               ItemReader<ElkoProduct> elkoProductsJsonGenerationItemReader, ItemWriter<ElkoProduct> elkoProductsJsonGenerationItemWriter) {
         Step step = stepBuilderFactory.get("step1")
                 .<ElkoProduct, ElkoProduct>chunk(1000)
                 .reader(allElkoProductsItemReader)
@@ -30,10 +31,17 @@ public class ElkoProductsJobConfig {
                 .writer(elkoProductAttributeItemWriter)
                 .build();
 
+        Step step3 = stepBuilderFactory.get("step3")
+                .<ElkoProduct, ElkoProduct>chunk(1000)
+                .reader(elkoProductsJsonGenerationItemReader)
+                .writer(elkoProductsJsonGenerationItemWriter)
+                .build();
+
         return jobBuilderFactory.get("elkoProductsJob")
                 .incrementer(new RunIdIncrementer())
                 .start(step)
                 .next(step2)
+                .next(step3)
                 .build();
 
     }

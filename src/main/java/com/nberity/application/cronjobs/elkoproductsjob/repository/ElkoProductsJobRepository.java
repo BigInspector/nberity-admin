@@ -18,6 +18,6 @@ public interface ElkoProductsJobRepository extends JpaRepository<ElkoProduct, Lo
     void deleteOldVersionNumbers();
 
     @Query(value = "SELECT * FROM elko_product elpr WHERE elpr.version_nr = (SELECT MAX(version_nr) FROM " +
-            "elko_product)", nativeQuery = true)
-    List<ElkoProduct> getAllLatestElkoProducts();
+            "elko_product) AND quantity != '0'", nativeQuery = true)
+    List<ElkoProduct> getAllLatestElkoProductsWithAvailableStock();
 }
