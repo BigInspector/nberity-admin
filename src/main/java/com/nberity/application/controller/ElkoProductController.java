@@ -20,7 +20,7 @@ public class ElkoProductController {
     }
 
     @RequestMapping(value = "/rest/elko-products", method = RequestMethod.GET,
-            produces = "application/json;charset=UTF-8")
+            produces = "application/json; charset=utf-8")
     public String getAvailableElkoProductsInJson() {
         return elkoProductsJobService.getAvailableElkoProductsInJson().getElkoProductJson();
     }
