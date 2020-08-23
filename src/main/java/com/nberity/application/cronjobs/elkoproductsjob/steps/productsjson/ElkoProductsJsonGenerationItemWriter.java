@@ -59,7 +59,9 @@ public class ElkoProductsJsonGenerationItemWriter implements ItemWriter<ElkoProd
 
             for (int j = 0; j < objectsInStringForm.size(); j++) {
                 JSONObject object = new JSONObject(objectsInStringForm.get(j));
-                productArray.put(object);
+                if (!(object.get("criteria").equals("Full Description Line"))) {
+                    productArray.put(object);
+                }
             }
 
             jsonArray.put(productArray);
