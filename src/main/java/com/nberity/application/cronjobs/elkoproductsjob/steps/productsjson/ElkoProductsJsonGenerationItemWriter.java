@@ -23,7 +23,7 @@ public class ElkoProductsJsonGenerationItemWriter implements ItemWriter<ElkoProd
 
     private ElkoProductsJobService elkoProductsJobService;
 
-    private JSONArray jsonArray;
+    private JSONArray allProductsArray;
 
     private int index;
 
@@ -35,38 +35,62 @@ public class ElkoProductsJsonGenerationItemWriter implements ItemWriter<ElkoProd
     @BeforeStep
     public void beforeStep(StepExecution stepExecution) {
         index = 0;
-        jsonArray = new JSONArray();
+        allProductsArray = new JSONArray();
     }
 
     @Override
     public void write(List<? extends ElkoProduct> items) {
         System.out.println("Generating JSON for batch: " + index);
         for (ElkoProduct elkoProduct : items) {
-            JSONArray productArray = new JSONArray();
+            JSONArray oneProductArray = new JSONArray();
 
             JSONObject elkoCodeJsonObject = new JSONObject();
             elkoCodeJsonObject.put("elkoCode", elkoProduct.getElkoCode());
-            productArray.put(elkoCodeJsonObject);
+            oneProductArray.put(elkoCodeJsonObject);
 
             JSONObject generalElkoProductData = new JSONObject(generateJsonForGeneralElkoProductData(elkoProduct));
-            productArray.put(generalElkoProductData);
+            oneProductArray.put(generalElkoProductData);
 
             JSONArray productDescriptionArray = new JSONArray(elkoProduct.getProductDescriptionJson());
             List<String> objectsInStringForm = new ArrayList<>();
             for (int i = 0; i < productDescriptionArray.length(); i++) {
                 objectsInStringForm.add(productDescriptionArray.get(i).toString());
             }
-
+            parseProductShippingMeasurements(objectsInStringForm, oneProductArray);
             for (int j = 0; j < objectsInStringForm.size(); j++) {
                 JSONObject object = new JSONObject(objectsInStringForm.get(j));
-                if (!(object.get("criteria").equals("Full Description Line"))) {
-                    productArray.put(object);
+                if (!(object.get("criteria").equals("Full Description Line") || object.get("criteria").equals("Shipping Box Depth") ||
+                        object.get("criteria").equals("Shipping Box Weight") || object.get("criteria").equals("Shipping Box Height")
+                        || object.get("criteria").equals("Shipping box quantity") || object.get("criteria").equals("Unit Brutto Volume")
+                        || object.get("criteria").equals("Shipping Box Width"))) {
+                    oneProductArray.put(object);
                 }
             }
 
-            jsonArray.put(productArray);
+            allProductsArray.put(oneProductArray);
         }
         index++;
+    }
+
+    private void parseProductShippingMeasurements(List<String> objectsInStringForm, JSONArray oneProductArray) {
+        for (int j = 0; j < objectsInStringForm.size(); j++) {
+            JSONObject object = new JSONObject(objectsInStringForm.get(j));
+            if (object.get("criteria").equals("Shipping Box Depth")) {
+                oneProductArray.put(object);
+            }
+            if (object.get("criteria").equals("Shipping Box Height")) {
+                oneProductArray.put(object);
+            }
+            if (object.get("criteria").equals("Shipping Box Weight")) {
+                oneProductArray.put(object);
+            }
+            if (object.get("criteria").equals("Unit Brutto Volume")) {
+                oneProductArray.put(object);
+            }
+            if (object.get("criteria").equals("Shipping Box Width")) {
+                oneProductArray.put(object);
+            }
+        }
     }
 
     private String generateJsonForGeneralElkoProductData(ElkoProduct elkoProduct) {
@@ -125,7 +149,7 @@ public class ElkoProductsJsonGenerationItemWriter implements ItemWriter<ElkoProd
     public void afterStep(StepExecution stepExecution) {
         System.out.println("Saving final JSON to database...");
         ElkoProductInfoJson elkoProductInfoJson = new ElkoProductInfoJson();
-        elkoProductInfoJson.setElkoProductJson(jsonArray.toString());
+        elkoProductInfoJson.setElkoProductJson(allProductsArray.toString());
         elkoProductsJobService.saveElkoProductsJson(elkoProductInfoJson);
         System.out.println("Elko product job finished");
     }
