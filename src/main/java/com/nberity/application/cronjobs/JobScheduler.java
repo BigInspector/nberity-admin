@@ -20,7 +20,7 @@ public class JobScheduler {
     @Autowired
     private Job elkoProductsJob;
 
-    @Scheduled(cron = "0 0 9,18 * * *")
+    @Scheduled(cron = "0 0 3,9,15,17 * * *")
     public void runElkoProductsJob() throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
         jobLauncher.run(elkoProductsJob, new JobParametersBuilder().addLong("uniqueness", System.nanoTime()).toJobParameters());
     }
